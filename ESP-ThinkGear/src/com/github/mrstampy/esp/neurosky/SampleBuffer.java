@@ -2,6 +2,12 @@ package com.github.mrstampy.esp.neurosky;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * Sample buffer for ThinkGear raw data with a capacity of 512 data points.
+ * 
+ * @author burton
+ * 
+ */
 public class SampleBuffer implements ThinkGearConstants {
 
 	private ArrayBlockingQueue<Double> queue = new ArrayBlockingQueue<Double>(FFT_SIZE);

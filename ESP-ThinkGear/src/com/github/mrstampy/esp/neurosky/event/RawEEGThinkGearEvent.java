@@ -3,14 +3,14 @@ package com.github.mrstampy.esp.neurosky.event;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
 
 /**
- * The current raw EEG output. Must be aggregated and processed by interested
- * subscribers.
+ * The current raw EEG output, 512 data points sampled at a rate of 100Hz. Must
+ * be aggregated and processed by interested subscribers.
  * 
  * @author burton
  */
 public class RawEEGThinkGearEvent extends AbstractThinkGearEvent {
 	private static final long serialVersionUID = 2172951607741290171L;
-	
+
 	private final double[] rawData;
 
 	public RawEEGThinkGearEvent(double[] sample) {

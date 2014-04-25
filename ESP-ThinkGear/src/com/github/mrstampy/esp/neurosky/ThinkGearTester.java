@@ -2,22 +2,42 @@ package com.github.mrstampy.esp.neurosky;
 
 import java.io.IOException;
 
+import com.github.mrstampy.esp.mutliconnectionsocket.AbstractSocketConnector;
 import com.github.mrstampy.esp.mutliconnectionsocket.MultiConnectionSocketException;
 import com.github.mrstampy.esp.neurosky.event.EventType;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearEventListenerAdapter;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearSocketConnector;
 
+/**
+ * Main class to demonstrate the use of local and remote notifications from the
+ * {@link MultiConnectionThinkGearSocket}.
+ * 
+ * @author burton
+ * 
+ */
 public class ThinkGearTester {
 
+	/**
+	 * No args == {@link #testLocalAggregation()}, any args == {@link #testRemoteAggregation()}
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length == 0) {
+		if (args.length == 0) {
 			testLocalAggregation();
 		} else {
 			testRemoteAggregation();
 		}
 	}
 
-	private static void testLocalAggregation() throws IOException, MultiConnectionSocketException, InterruptedException {
+	/**
+	 * Demonstrates local raw data acquisition
+	 * 
+	 * @throws IOException
+	 * @throws MultiConnectionSocketException
+	 * @throws InterruptedException
+	 */
+	protected static void testLocalAggregation() throws IOException, MultiConnectionSocketException, InterruptedException {
 		System.out.println("Local Aggregation");
 		MultiConnectionThinkGearSocket thinkGearSocket = new MultiConnectionThinkGearSocket("localhost");
 		thinkGearSocket.setRawData(true);
@@ -29,7 +49,14 @@ public class ThinkGearTester {
 		printSampleLengths(adapter);
 	}
 
-	private static void testRemoteAggregation() throws Exception {
+	/**
+	 * Connects to the {@link MultiConnectionThinkGearSocket} on the default port
+	 * (12345) to receive raw data events.
+	 * 
+	 * @throws Exception
+	 * @see {@link AbstractSocketConnector#SOCKET_BROADCASTER_KEY}
+	 */
+	protected static void testRemoteAggregation() throws Exception {
 		System.out.println("Remote Aggregation");
 		MultiConnectionThinkGearSocket thinkGearSocket = new MultiConnectionThinkGearSocket("localhost", true);
 		thinkGearSocket.setRawData(true);
