@@ -46,6 +46,10 @@ public class ThinkGearEventListenerAdapter implements ThinkGearEventListener {
 			break;
 		}
 	}
+	
+	public ThinkGearSignalAggregator getAggregator() {
+		return aggregator;
+	}
 
 	/**
 	 * If raw data acquisition is enable this method returns the current seonds'
