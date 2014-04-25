@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+	   xmlns:m="http://ant.apache.org/ivy/maven">
+       
+	<info organisation="com.github.mrstampy" module="esp-thinkgear" status="integration" revision="1.3-SNAPSHOT" />
+	    
+    <publications>
+        <artifact name="esp-thinkgear"/>
+        <artifact name="esp-thinkgear" type="pom" ext="pom" />
+        <artifact name="esp-thinkgear" type="javadoc" m:classifier="javadoc" ext="jar" />
+        <artifact name="esp-thinkgear" type="sources" m:classifier="sources" ext="jar" />
+    </publications>
+	
+	<dependencies>
+		<dependency org="com.github.mrstampy" name="esp" rev="1.3-SNAPSHOT"/>
+	</dependencies>
+	
+</ivy-module>
