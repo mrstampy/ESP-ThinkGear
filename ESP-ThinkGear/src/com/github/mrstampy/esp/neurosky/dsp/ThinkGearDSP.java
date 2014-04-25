@@ -11,6 +11,12 @@ import com.github.mrstampy.esp.neurosky.MultiConnectionThinkGearSocket;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearEventListenerAdapter;
 
+/**
+ * {@link EspDSP} default implementation for NeuroSky ThinkGear devices.
+ * 
+ * @author burton
+ * 
+ */
 public class ThinkGearDSP extends EspDSP<MultiConnectionThinkGearSocket> implements ThinkGearConstants {
 	private ThinkGearEventListenerAdapter adapter = new ThinkGearEventListenerAdapter();
 	private ThinkGearSignalUtilities utilities = new ThinkGearSignalUtilities();
@@ -45,7 +51,7 @@ public class ThinkGearDSP extends EspDSP<MultiConnectionThinkGearSocket> impleme
 	public static void main(String... args) throws Exception {
 		MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket();
 		socket.setRawData(true);
-		
+
 		final ThinkGearDSP dsp = new ThinkGearDSP(socket, 3.6, 5.4, 7.83, 10.4);
 		dsp.addProcessedListener(new RawProcessedListener() {
 
