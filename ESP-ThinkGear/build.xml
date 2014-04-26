@@ -122,6 +122,10 @@
 		<delete dir="${basedir}/build/javadoc" />
 		<mkdir dir="${basedir}/build/javadoc" />
 
+		<copy file="${basedir}/html/LocalMCSUse.jpg" todir="${basedir}/build/javadoc"/>
+		<copy file="${basedir}/html/RemoteMCSUse.png" todir="${basedir}/build/javadoc"/>
+		<copy file="${basedir}/html/RawDataProcessing.jpg" todir="${basedir}/build/javadoc"/>
+
 		<javadoc 
 			overview="html/Overview.html"
 			classpathref="ESP.classpath" 

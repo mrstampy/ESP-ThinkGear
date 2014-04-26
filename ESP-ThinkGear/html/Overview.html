@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<body>
+	<h1>ESP-ThinkGear - EEG Signal Processing for the OCZ ThinkGear</h1>
+	<h2>Release 1.3, 26-04-14</h2>
+	<p>
+		This Java library provides the implementation of <a href="http://mrstampy.github.com/ESP/">ESP</a> library classes to acquire the
+		raw EEG signal from NeuroSky ThinkGear devices. 
+		ESP-ThinkGear was compiled for Java version 1.6 compatibility. The core classes have been designed with speed and concurrency
+		in mind using high performance Java libraries:
+	<ul>
+		<li><a href="https://github.com/LMAX-Exchange/disruptor">Disruptor</a></li>
+		<li><a href="http://javolution.org/">Javolution</a></li>
+		<li><a href="http://mina.apache.org/">Apache MINA</a></li>
+	</ul>
+	
+	<h2>Example classes</h2>
+	
+	<p>
+		<a href="com/github/mrstampy/esp/neurosky/ThinkGearTester.html">ThinkGearTester</a><br></br>
+		<a href="com/github/mrstampy/esp/neurosky/dsp/ThinkGearDSP.html">ThinkGearDSP</a>
+	</p>
+	
+	<h2>Architecture</h2>
+	
+	<img src="LocalMCSUse.jpg" alt="Local use of the Multi Connection ThinkGear Socket" />
+	<p>
+		The <a href="com/github/mrstampy/esp/neurosky/MultiConnectionThinkGearSocket.html">MultiConnectionThinkGearSocket</a>
+		is the core class of this library.  Listeners can register themselves with the socket implementation and will receive the generated
+		events as they occur, allowing near-realtime signal acquisition from the device. 
+	</p>
+	<p>
+		But this doesn't explain the 'multi connection' name...
+	</p>
+	
+	<h3>Remote Connection to the Multi Connection ThinkGear Socket</h3>
+	<img src="RemoteMCSUse.png" alt="Remote use of the Multi Connection ThinkGear Socket" />
+	<p>
+		The Multi Connection ThinkGear Socket allows connections from the
+		<a href="com/github/mrstampy/esp/neurosky/subscription/ThinkGearSocketConnector.html">ThinkGearSocketConnector</a>.
+		Multi connection sockets can accept many such remote connections (theoretically thousands).
+		The connections can be running in the same JVM or in different Java programs, even on different computers.  Due to the introduced
+		latency resulting from the remote connection the signal received cannot be considered near-realtime, however the socket connector
+		is quite useful for highly buffered signals and for applications such as data recorders. 
+	</p>
+	<p>
+		Applications using the socket connector create the connection to the multi connection socket and subscribe to receive 
+		device-specific events.  Listeners register themselves with the socket connector and receive the event notifications
+		as they are received by the socket connector.
+	</p>
+	
+	<h3>Raw Signal Processing (new in version 1.3)</h3>
+	<img src="RawDataProcessing.jpg" alt="Raw data processing"/>
+	<p>
+		In the development of the <a href="http://mrstampy.github.com/ESP-Nia/">ESP-Nia</a> implementation the base classes
+		for raw signal processing were developed.  Multi connection socket implementations contain a raw data buffer which contains
+		the current second's worth of data (for the OCZ ThinkGear this translates to 3910 data points, for the ThinkGear devices this translates
+		to 512 data points).  A sampler snapshots the buffer at a rate of 100Hz and raw data events are generated from the snapshots
+		(for both the ThinkGear and ThinkGear implementations each snapshot consists of 512 evenly spaced data points).
+	</p>
+	<p>
+		Raw data event listeners can make use of <a href="com/github/mrstampy/esp/neurosky/dsp/ThinkGearSignalAggregator.html">ThinkGearSignalAggregator</a> 
+		which keeps the current second's worth of snapshots in memory (100).  The 
+		<a href="com/github/mrstampy/esp/neurosky/dsp/ThinkGearDSP.html">ThinkGearDSP</a> class
+		provides the ability to apply signal processing algorithms to the current group of snapshots and notifies any 
+		RawProcessedListeners upon completion of each cycle. 
+		A <a href="com/github/mrstampy/esp/neurosky/dsp/ThinkGearSignalUtilities.html">utility</a> class is provided which contains
+		methods which may be useful in processing the raw signal and the ESP library contains classes liberated from 
+		<a href="https://github.com/ddf/Minim">Minim</a>
+		and <a href="https://github.com/marytts/marytts/">MaryTTS</a> projects which can be used to process the signal.
+	</p>
+	<p>
+		The goal of the ESP raw signal processing is to line the ducks up in a row for processing.  How the signal is 
+		processed is up to the application using the library.
+	</p>
+
+	Additional functionality is described in these JavaDocs. This work is
+	released under the GPL 3.0 license. No warranty of any kind is offered.
+	<a href="http://mrstampy.github.com/ESP-ThinkGear/">ESP-ThinkGear</a> Copyright (C) 2014 Burton Alexander. 
+	eSense
+	<sup>TM</sup>, ThinkGear
+	<sup>TM</sup>, MDT
+	<sup>TM</sup>, NeuroBoy
+	<sup>TM</sup> and NeuroSky
+	<sup>TM</sup> are trademarks of
+	<a href="http://www.neurosky.com">NeuroSky Inc</a>. OCZ Nia <sup>TM</sup> is the trademark of <a href="http://www.ocz.com">OCZ</a>.
+</body>
+</html>
