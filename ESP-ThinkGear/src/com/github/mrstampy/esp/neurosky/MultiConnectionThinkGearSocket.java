@@ -284,6 +284,36 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 		}
 	}
 
+	/**
+	 * When invoked the tuning functionality of the {@link SampleBuffer} will be
+	 * activated. The tuning process takes ~ 10 seconds, during which the number
+	 * of samples will be counted and used to resize the buffer to more closely
+	 * represent 1 seconds' worth of data.
+	 */
+	public void tune() {
+		if(!isConnected()) {
+			log.warn("Must be connected to the Nia to tune");
+			return;
+		}
+		
+		log.info("Tuning sample buffer");
+
+		sampleBuffer.tune();
+
+		Thread thread = new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+
+				}
+				sampleBuffer.stopTuning();
+			}
+		};
+
+		thread.start();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
