@@ -36,7 +36,9 @@ import com.github.mrstampy.esp.neurosky.subscription.ThinkGearSocketConnector;
 public class ThinkGearTester {
 
 	/**
-	 * No args == {@link #testLocalAggregation()}, any args == {@link #testRemoteAggregation()}
+	 * No args == {@link #testLocalAggregation()}, any args ==
+	 * {@link #testRemoteAggregation()}
+	 * 
 	 * @param args
 	 * @throws Exception
 	 */
@@ -64,7 +66,7 @@ public class ThinkGearTester {
 
 		thinkGearSocket.start();
 
-		printSampleLengths(adapter);
+		printSampleLengths(adapter, thinkGearSocket);
 	}
 
 	/**
@@ -88,12 +90,20 @@ public class ThinkGearTester {
 
 		thinkGearSocket.start();
 
-		printSampleLengths(adapter);
+		printSampleLengths(adapter, thinkGearSocket);
 	}
 
-	private static void printSampleLengths(ThinkGearEventListenerAdapter adapter) throws InterruptedException {
+	private static void printSampleLengths(ThinkGearEventListenerAdapter adapter, MultiConnectionThinkGearSocket socket)
+			throws InterruptedException {
+		boolean tuning = false;
+		int cntr = 0;
 		while (true) {
 			Thread.sleep(1000);
+			cntr++;
+			if (!tuning && cntr > 4) {
+				tuning = true;
+				socket.tune();
+			}
 			double[][] sampled = adapter.getCurrentSecondOfSampledData();
 
 			int length = sampled.length;
