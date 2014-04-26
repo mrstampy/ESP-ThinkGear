@@ -18,7 +18,7 @@
  */
 package com.github.mrstampy.esp.neurosky.subscription;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.event.AbstractMultiConnectionEvent;
+import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
 import com.github.mrstampy.esp.neurosky.dsp.ThinkGearSignalAggregator;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;

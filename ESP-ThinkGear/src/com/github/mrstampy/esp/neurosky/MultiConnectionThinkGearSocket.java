@@ -115,9 +115,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.AbstractMultiConnectionSocket;
-import com.github.mrstampy.esp.mutliconnectionsocket.MultiConnectionSocketException;
-import com.github.mrstampy.esp.mutliconnectionsocket.event.AbstractMultiConnectionEvent;
+import com.github.mrstampy.esp.multiconnectionsocket.AbstractMultiConnectionSocket;
+import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
+import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.BlinkStrengthThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.EEGPowerThinkGearEvent;

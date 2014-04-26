@@ -20,7 +20,7 @@ package com.github.mrstampy.esp.neurosky.subscription;
 
 import java.util.EventListener;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.event.AbstractMultiConnectionEvent;
+import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.EventType;
 

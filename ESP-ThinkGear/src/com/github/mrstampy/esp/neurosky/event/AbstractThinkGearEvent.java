@@ -18,7 +18,7 @@
  */
 package com.github.mrstampy.esp.neurosky.event;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.event.AbstractMultiConnectionEvent;
+import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 
 /**
  * Abstract event for Neurosky output

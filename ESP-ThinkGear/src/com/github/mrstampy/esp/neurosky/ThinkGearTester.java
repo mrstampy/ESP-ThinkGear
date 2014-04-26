@@ -20,8 +20,8 @@ package com.github.mrstampy.esp.neurosky;
 
 import java.io.IOException;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.AbstractSocketConnector;
-import com.github.mrstampy.esp.mutliconnectionsocket.MultiConnectionSocketException;
+import com.github.mrstampy.esp.multiconnectionsocket.AbstractSocketConnector;
+import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
 import com.github.mrstampy.esp.neurosky.event.EventType;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearEventListenerAdapter;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearSocketConnector;

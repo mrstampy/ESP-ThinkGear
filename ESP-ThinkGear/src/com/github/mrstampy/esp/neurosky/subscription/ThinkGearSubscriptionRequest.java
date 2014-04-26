@@ -18,7 +18,7 @@
  */
 package com.github.mrstampy.esp.neurosky.subscription;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.subscription.MultiConnectionSubscriptionRequest;
+import com.github.mrstampy.esp.multiconnectionsocket.subscription.MultiConnectionSubscriptionRequest;
 import com.github.mrstampy.esp.neurosky.event.EventType;
 
 /**

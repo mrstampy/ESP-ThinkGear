@@ -22,7 +22,7 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.mrstampy.esp.mutliconnectionsocket.AbstractSubscriptionHandlerAdapter;
+import com.github.mrstampy.esp.multiconnectionsocket.AbstractSubscriptionHandlerAdapter;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.EventType;
 import com.github.mrstampy.esp.neurosky.subscription.NeuroskyMessage;
