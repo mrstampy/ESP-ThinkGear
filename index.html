@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Esp-thinkgear : ESP-ThinkGear - EEG Signal Processing for NeuroSky ThinkGear Devices" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Esp-thinkgear</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mrstampy/ESP-ThinkGear">View on GitHub</a>
+
+          <h1 id="project_title">Esp-thinkgear</h1>
+          <h2 id="project_tagline">ESP-ThinkGear - EEG Signal Processing for NeuroSky ThinkGear Devices</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mrstampy/ESP-ThinkGear/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mrstampy/ESP-ThinkGear/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="esp-thinkgear---eeg-signal-processing-for-neurosky-thinkgear-devices" class="anchor" href="#esp-thinkgear---eeg-signal-processing-for-neurosky-thinkgear-devices"><span class="octicon octicon-link"></span></a>ESP-ThinkGear - EEG Signal Processing for NeuroSky ThinkGear Devices</h1>
+
+<p>This library provides the <a href="http://www.neurosky.com">NeuroSky</a> MindWave ThinkGear connector implementation of the <a href="http://mrstampy.github.io/ESP/">ESP</a> library base classes. It is designed to be fast and efficient, using high performance Java libraries:</p>
+
+<ul>
+<li><a href="https://github.com/LMAX-Exchange/disruptor">Disruptor</a></li>
+<li><a href="http://javolution.org/">Javolution</a></li>
+<li><a href="http://mina.apache.org/">Apache MINA</a></li>
+</ul><h2>
+<a name="maven-dependency" class="anchor" href="#maven-dependency"><span class="octicon octicon-link"></span></a>Maven Dependency</h2>
+
+<pre><code>   &lt;dependency&gt;
+       &lt;groupId&gt;com.github.mrstampy&lt;/groupId&gt;
+       &lt;artifactId&gt;esp-thinkgear&lt;/artifactId&gt;
+       &lt;version&gt;1.3&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>Usage of the library is straight-forward. One only needs to instantiate the MultiConnectionThinkGearSocket implementation, add a listener, start the socket and deal with the events as they occur.</p>
+
+<h2>
+<a name="multiple-connections" class="anchor" href="#multiple-connections"><span class="octicon octicon-link"></span></a>Multiple Connections</h2>
+
+<p>As implied by the name of the class, the MultiConnectionThinkGearSocket is capable of not only processing ThinkGear messages for a single application but also of broadcasting the messages to separate applications, even on separate machines and devices! This functionality is disabled by default. To enable it either set the System property 'broadcast.messages' to true or instantiate the MultiConnectionThinkGearSocket using one of its other constructors:</p>
+
+<pre><code>MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket("ThinkGear socket hostname", true);
+...
+socket.start();
+
+...and then in another application:
+</code></pre>
+
+<p>ThinkGearSocketConnector connector = new ThinkGearSocketConnector("Hostname running MultiConnectionThinkGearSocket");</p>
+
+<pre><code>connector.addThinkGearEventListener(new ThinkGearEventListenerAdapter() {
+    // overriding methods as appropriate
+});
+
+connector.connect();
+
+//after successful connection...
+connector.subscribe(EventType...);
+</code></pre>
+
+<h2>
+<a name="raw-signal-processing-as-of-version-13" class="anchor" href="#raw-signal-processing-as-of-version-13"><span class="octicon octicon-link"></span></a>Raw Signal Processing (as of version 1.3)</h2>
+
+<p>In the development of the <a href="http://mrstampy.github.com/ESP-Nia/">ESP-Nia</a> implementation the base classes for raw signal processing were developed.  Multi connection socket implementations contain a raw data buffer which contains the current second's worth of data (for the OCZ Nia this translates to 3910 data points, for the ThinkGear devices this translates to 512 data points).  A sampler snapshots the buffer at a rate of 100Hz and raw data events are generated from the snapshots (for both the ThinkGear and ThinkGear implementations each snapshot consists of 512 evenly spaced data points).</p>
+
+<p>Additional classes have been added to assist with raw signal processing. The examples shown will work with the NeuroSky raw output however these classes can be used for any DSP work with low sample sizes (ie. &lt; 1000 samples / sec).  For greater sample sizes the utilization of primitive arrays is recommended.</p>
+
+<p>Additional functionality is described in the JavaDocs. This work is released under the GPL 3.0 license. No warranty of any kind is offered.</p>
+
+<p><a href="http://mrstampy.github.io/ESP-ThinkGear/">ESP-ThinkGear</a> Copyright (C) 2014 Burton Alexander. </p>
+
+<p>eSense, ThinkGear, MDT, NeuroBoy and NeuroSky are trademarks of <a href="http://www.neurosky.com">NeuroSky Inc</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Esp-thinkgear maintained by <a href="https://github.com/mrstampy">mrstampy</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
