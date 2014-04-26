@@ -44,6 +44,6 @@ Additional classes have been added to assist with raw signal processing. The exa
 
 Additional functionality is described in the JavaDocs. This work is released under the GPL 3.0 license. No warranty of any kind is offered.
 
-[ESP](http://mrstampy.github.io/ESP-ThinkGear/) Copyright (C) 2014 Burton Alexander. 
+[ESP-ThinkGear](http://mrstampy.github.io/ESP-ThinkGear/) Copyright (C) 2014 Burton Alexander. 
 
 eSense, ThinkGear, MDT, NeuroBoy and NeuroSky are trademarks of [NeuroSky Inc](http://www.neurosky.com).
