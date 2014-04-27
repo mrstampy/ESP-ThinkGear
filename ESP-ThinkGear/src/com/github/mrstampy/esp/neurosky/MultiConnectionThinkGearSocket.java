@@ -300,18 +300,13 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 
 		sampleBuffer.tune();
 
-		Thread thread = new Thread() {
-			public void run() {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
+		scheduledExecutorService.schedule(new Runnable() {
 
-				}
+			@Override
+			public void run() {
 				sampleBuffer.stopTuning();
 			}
-		};
-
-		thread.start();
+		}, 10, TimeUnit.SECONDS);
 	}
 
 	/*
