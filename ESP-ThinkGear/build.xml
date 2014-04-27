@@ -7,7 +7,7 @@
 	<!-- defined maven snapshots and staging repository id and url -->
 	<property name="ESP.version" value="&ESP.version;"/>
 	<property name="esp.description" value="ESP ThinkGear - An EEG Signal Processing Library for NeuroSky ThinkGear devices"/>
-	<property name="esp.website" value="http://mrstampy.github.com/ESP-ThinkGear/"/>
+	<property name="esp.website" value="http://mrstampy.github.io/ESP-ThinkGear/"/>
 	<property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
 	<property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots/" />
 	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />

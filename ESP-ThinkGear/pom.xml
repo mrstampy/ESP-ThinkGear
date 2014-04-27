@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
   <version>$ESP.version</version>
   <description>ESP-ThinkGear - An EEG Signal Processing Library for NeuroSky ThinkGear devices</description>
-  <url>http://mrstampy.github.com/ESP/</url>
+  <url>http://mrstampy.github.io/ESP-ThinkGear/</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License</name>
