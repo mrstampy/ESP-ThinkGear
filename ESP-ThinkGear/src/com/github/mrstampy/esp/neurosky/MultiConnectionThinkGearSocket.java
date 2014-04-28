@@ -248,6 +248,8 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 		this.host = host;
 		this.rawData = rawData;
 		this.canSendNeuroskyMessages = canSendNeuroskyMessages;
+		
+		addConnectionEventListener(sampleBuffer);
 
 		log.info("MultiConnectonThinkGearSocket is {} events", broadcasting ? "broadcasting" : "not broadcasting");
 	}
