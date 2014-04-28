@@ -3,7 +3,7 @@
        xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
 	   xmlns:m="http://ant.apache.org/ivy/maven">
        
-	<info organisation="com.github.mrstampy" module="esp-thinkgear" status="integration" revision="1.3" />
+	<info organisation="com.github.mrstampy" module="esp-thinkgear" status="integration" revision="2.0-SNAPSHOT" />
 	    
     <publications>
         <artifact name="esp-thinkgear"/>
@@ -13,7 +13,7 @@
     </publications>
 	
 	<dependencies>
-		<dependency org="com.github.mrstampy" name="esp" rev="1.3"/>
+		<dependency org="com.github.mrstampy" name="esp" rev="2.0-SNAPSHOT"/>
 	</dependencies>
 	
 </ivy-module>
