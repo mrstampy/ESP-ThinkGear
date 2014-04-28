@@ -23,6 +23,8 @@ public class ThinkGearDSPValues extends AbstractDSPValues implements ThinkGearCo
 		if (sampleSize > FFT_SIZE) {
 			throw new IllegalArgumentException("Sample size must be <= 512: " + sampleSize);
 		}
+		
+		super.setSampleSize(sampleSize);
 	}
 
 }
