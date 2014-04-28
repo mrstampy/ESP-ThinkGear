@@ -16,8 +16,8 @@
   <url>http://mrstampy.github.io/ESP-ThinkGear/</url>
   <licenses>
     <license>
-      <name>GNU Lesser General Public License</name>
-      <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+      <name>GNU General Public License</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
