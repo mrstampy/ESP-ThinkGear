@@ -96,12 +96,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -114,6 +111,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import rx.Observable;
+import rx.Scheduler;
+import rx.Scheduler.Inner;
+import rx.Scheduler.Recurse;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import com.github.mrstampy.esp.multiconnectionsocket.AbstractMultiConnectionSocket;
 import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
@@ -158,15 +163,13 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	private ReadLock readLock = listenerLock.readLock();
 	private WriteLock writeLock = listenerLock.writeLock();
 
-	private Thread socketReadThread;
-
 	private boolean rawData;
 
 	private boolean canSendNeuroskyMessages;
 
 	private SampleBuffer sampleBuffer = new SampleBuffer();
-	private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(3);
-	private ScheduledFuture<?> future;
+	private Scheduler scheduler = Schedulers.executor(Executors.newScheduledThreadPool(3));
+	private Subscription subscription;
 
 	/**
 	 * Connects to the ThinkGear socket on the local host. The system property
@@ -291,19 +294,19 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	 * represent 1 seconds' worth of data.
 	 */
 	public void tune() {
-		if(!isConnected()) {
+		if (!isConnected()) {
 			log.warn("Must be connected to the Nia to tune");
 			return;
 		}
-		
+
 		log.info("Tuning sample buffer");
 
 		sampleBuffer.tune();
 
-		scheduledExecutorService.schedule(new Runnable() {
+		scheduler.schedule(new Action1<Scheduler.Inner>() {
 
 			@Override
-			public void run() {
+			public void call(Inner t1) {
 				sampleBuffer.stopTuning();
 			}
 		}, 10, TimeUnit.SECONDS);
@@ -333,10 +336,10 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	}
 
 	private void startSampleCollection() {
-		future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+		subscription = scheduler.schedulePeriodically(new Action1<Scheduler.Inner>() {
 
 			@Override
-			public void run() {
+			public void call(Inner t1) {
 				processSnapshot(sampleBuffer.getSnapshot());
 			}
 		}, (long) SAMPLE_RATE * 2, (long) SAMPLE_SLEEP, TimeUnit.MILLISECONDS);
@@ -347,8 +350,14 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	}
 
 	private void eventPerformed(AbstractThinkGearEvent event) {
-		notifyListeners(event);
-		if (canBroadcast()) subscriptionHandlerAdapter.sendMultiConnectionEvent(event);
+		Observable.from(event).subscribe(new Action1<AbstractThinkGearEvent>() {
+
+			@Override
+			public void call(AbstractThinkGearEvent t1) {
+				notifyListeners(t1);
+				if (canBroadcast()) subscriptionHandlerAdapter.sendMultiConnectionEvent(t1);
+			}
+		});
 	}
 
 	/*
@@ -359,7 +368,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	@Override
 	protected void stopImpl() {
 		try {
-			if (future != null) future.cancel(true);
+			if (subscription != null) subscription.unsubscribe();
 			closeSocket();
 		} catch (Throwable e) {
 			log.error("Unexpected exception on stop", e);
@@ -433,12 +442,10 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 		if (neuroSocket == null) return;
 
 		try {
-			socketReadThread.interrupt();
 			neuroSocket.close();
 			out.close();
 			stdIn.close();
 
-			socketReadThread = null;
 			neuroSocket = null;
 			out = null;
 			stdIn = null;
@@ -447,41 +454,47 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 		}
 	}
 
-	private void sendFormats() throws MultiConnectionSocketException {
-		JSONObject format = new JSONObject();
-		try {
-			format.put("enableRawOutput", rawData);
-			format.put("format", "Json");
-		} catch (JSONException e) {
-			log.error("Could not create formats object", e);
-			throw new MultiConnectionSocketException(e);
-		}
+	private void sendFormats() {
+		scheduler.schedule(new Action1<Scheduler.Inner>() {
 
-		sendMessage(format.toString());
+			@Override
+			public void call(Inner t1) {
+				JSONObject format = new JSONObject();
+
+				try {
+					format.put("enableRawOutput", rawData);
+					format.put("format", "Json");
+				} catch (JSONException e) {
+					log.error("Could not create formats object", e);
+				}
+
+				sendMessage(format.toString());
+			}
+		});
 	}
 
 	private void startReadThread() {
-		socketReadThread = new Thread("MultiConnectionThinkGearSocket read thread") {
-			public void run() {
+		scheduler.scheduleRecursive(new Action1<Scheduler.Recurse>() {
+
+			@Override
+			public void call(Recurse t1) {
 				String userInput;
 				try {
-					while (neuroSocket.isConnected() && (userInput = stdIn.readLine()) != null) {
-						String[] packets = userInput.split("/\r/");
-						for (int s = 0; s < packets.length; s++) {
-							if (((String) packets[s]).indexOf("{") > -1) {
-								publishMessage(packets[s]);
-							}
+					if (!neuroSocket.isConnected() || (userInput = stdIn.readLine()) == null) return;
+
+					String[] packets = userInput.split("/\r/");
+					for (int s = 0; s < packets.length; s++) {
+						if (((String) packets[s]).indexOf("{") > -1) {
+							publishMessage(packets[s]);
 						}
 					}
-				} catch (SocketException e) {
-					log.debug("Unexpected socket exception", e);
-				} catch (Throwable e) {
+
+					t1.schedule();
+				} catch (Exception e) {
 					log.error("Unexpected exception", e);
 				}
 			}
-		};
-
-		socketReadThread.start();
+		});
 	}
 
 	@Override
