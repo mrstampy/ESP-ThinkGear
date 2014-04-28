@@ -27,6 +27,7 @@ import com.github.mrstampy.esp.dsp.RawProcessedListener;
 import com.github.mrstampy.esp.dsp.RawSignalAggregator;
 import com.github.mrstampy.esp.neurosky.MultiConnectionThinkGearSocket;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
+import com.github.mrstampy.esp.neurosky.ThinkGearDSPValues;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearEventListenerAdapter;
 
 /**
@@ -40,7 +41,7 @@ public class ThinkGearDSP extends EspDSP<MultiConnectionThinkGearSocket> impleme
 	private ThinkGearSignalUtilities utilities = new ThinkGearSignalUtilities();
 
 	protected ThinkGearDSP(MultiConnectionThinkGearSocket socket, double... frequencies) {
-		super(socket, (int) SAMPLE_RATE, frequencies);
+		super(socket, ThinkGearDSPValues.getInstance().getSampleRate(), frequencies);
 
 		socket.addListener(adapter);
 	}

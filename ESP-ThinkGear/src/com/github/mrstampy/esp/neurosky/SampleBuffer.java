@@ -29,7 +29,7 @@ import com.github.mrstampy.esp.multiconnectionsocket.RawDataSampleBuffer;
 public class SampleBuffer extends RawDataSampleBuffer<Double> implements ThinkGearConstants {
 
 	public SampleBuffer() {
-		super(FFT_SIZE, FFT_SIZE);
+		super(FFT_SIZE, ThinkGearDSPValues.getInstance().getSampleSize());
 	}
 
 	public void addSample(Double sample) {

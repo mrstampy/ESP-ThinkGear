@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 
 import com.github.mrstampy.esp.dsp.EspSignalUtilities;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
+import com.github.mrstampy.esp.neurosky.ThinkGearDSPValues;
 
 import ddf.minim.analysis.HammingWindow;
 
@@ -35,12 +36,12 @@ public class ThinkGearSignalUtilities extends EspSignalUtilities implements Thin
 
 	@Override
 	protected int getFFTSize() {
-		return FFT_SIZE;
+		return ThinkGearDSPValues.getInstance().getSampleSize();
 	}
 
 	@Override
 	protected double getSampleRate() {
-		return SAMPLE_RATE;
+		return ThinkGearDSPValues.getInstance().getSampleRate();
 	}
 
 	@Override

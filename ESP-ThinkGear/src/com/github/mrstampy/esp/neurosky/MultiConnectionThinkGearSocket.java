@@ -336,13 +336,19 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	}
 
 	private void startSampleCollection() {
+		ThinkGearDSPValues values = ThinkGearDSPValues.getInstance();
+
+		long pause = values.getSampleRate() * 2;
+		long snooze = values.getSampleRateSleepTime();
+		TimeUnit tu = values.getSampleRateUnits();
+
 		subscription = scheduler.schedulePeriodically(new Action1<Scheduler.Inner>() {
 
 			@Override
 			public void call(Inner t1) {
 				processSnapshot(sampleBuffer.getSnapshot());
 			}
-		}, (long) SAMPLE_RATE * 2, (long) SAMPLE_SLEEP, TimeUnit.MILLISECONDS);
+		}, pause, snooze, tu);
 	}
 
 	protected void processSnapshot(double[] snapshot) {

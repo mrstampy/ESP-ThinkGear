@@ -20,8 +20,7 @@ package com.github.mrstampy.esp.neurosky;
 
 public interface ThinkGearConstants {
 
-	public static final double SAMPLE_RATE = 100;
-	public static final double SAMPLE_SLEEP = 1000 / SAMPLE_RATE;
+	public static final int SAMPLE_RATE = 100;
 
 	public static final int FFT_SIZE = 512;
 	
