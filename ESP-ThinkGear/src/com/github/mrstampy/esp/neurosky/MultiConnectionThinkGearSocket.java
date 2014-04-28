@@ -358,7 +358,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	}
 
 	private void eventPerformed(AbstractThinkGearEvent event) {
-		Observable.from(event).subscribe(new Action1<AbstractThinkGearEvent>() {
+		Observable.just(event).subscribe(new Action1<AbstractThinkGearEvent>() {
 
 			@Override
 			public void call(AbstractThinkGearEvent t1) {
