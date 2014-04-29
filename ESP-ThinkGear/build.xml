@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ant [
-	<!ENTITY ESP.version "2.0-SNAPSHOT">
+	<!ENTITY ESP.version "2.0">
 ]>
 <project name="ESP-ThinkGear" basedir="." default="create deployables" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:m="http://ant.apache.org/ivy/maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
