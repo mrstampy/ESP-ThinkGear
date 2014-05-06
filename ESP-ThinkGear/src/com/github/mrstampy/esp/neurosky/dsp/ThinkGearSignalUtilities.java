@@ -20,6 +20,7 @@ package com.github.mrstampy.esp.neurosky.dsp;
 
 import java.math.BigDecimal;
 
+import com.github.mrstampy.esp.dsp.AbstractDSPValues;
 import com.github.mrstampy.esp.dsp.EspSignalUtilities;
 import com.github.mrstampy.esp.neurosky.ThinkGearConstants;
 import com.github.mrstampy.esp.neurosky.ThinkGearDSPValues;
@@ -47,6 +48,11 @@ public class ThinkGearSignalUtilities extends EspSignalUtilities implements Thin
 	@Override
 	protected BigDecimal getRawSignalBreadth() {
 		return SIGNAL_BREADTH;
+	}
+
+	@Override
+	public AbstractDSPValues getDSPValues() {
+		return ThinkGearDSPValues.getInstance();
 	}
 
 }
