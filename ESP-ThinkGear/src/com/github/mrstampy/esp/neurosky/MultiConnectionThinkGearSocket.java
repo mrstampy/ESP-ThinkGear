@@ -122,6 +122,7 @@ import rx.schedulers.Schedulers;
 
 import com.github.mrstampy.esp.multiconnectionsocket.AbstractMultiConnectionSocket;
 import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
+import com.github.mrstampy.esp.multiconnectionsocket.ConnectionEvent.State;
 import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.BlinkStrengthThinkGearEvent;
@@ -500,6 +501,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 					t1.schedule();
 				} catch (Exception e) {
 					log.error("Unexpected exception", e);
+					notifyConnectionEventListeners(State.ERROR_STOPPED);
 				}
 			}
 		});
