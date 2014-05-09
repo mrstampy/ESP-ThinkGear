@@ -22,9 +22,9 @@ import java.io.IOException;
 
 import com.github.mrstampy.esp.dsp.AbstractDSPValues;
 import com.github.mrstampy.esp.dsp.EspSignalUtilities;
-import com.github.mrstampy.esp.multiconnectionsocket.AbstractRawEspConnection;
+import com.github.mrstampy.esp.dsp.lab.AbstractRawEspConnection;
+import com.github.mrstampy.esp.dsp.lab.RawEspConnection;
 import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
-import com.github.mrstampy.esp.multiconnectionsocket.RawEspConnection;
 import com.github.mrstampy.esp.neurosky.dsp.ThinkGearSignalUtilities;
 import com.github.mrstampy.esp.neurosky.subscription.ThinkGearEventListenerAdapter;
 
