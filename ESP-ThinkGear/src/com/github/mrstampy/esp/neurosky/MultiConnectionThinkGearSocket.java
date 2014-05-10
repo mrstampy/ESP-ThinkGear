@@ -501,7 +501,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 					t1.schedule();
 				} catch (Exception e) {
 					log.error("Unexpected exception", e);
-					notifyConnectionEventListeners(State.ERROR_STOPPED);
+					if(isConnected()) notifyConnectionEventListeners(State.ERROR_STOPPED);
 				}
 			}
 		});
