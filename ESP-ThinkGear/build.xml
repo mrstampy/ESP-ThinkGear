@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ant [
-	<!ENTITY ESP.version "2.0">
+	<!ENTITY ESP.version "2.1-SNAPSHOT">
 ]>
 <project name="ESP-ThinkGear" basedir="." default="create deployables" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:m="http://ant.apache.org/ivy/maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
@@ -30,6 +30,10 @@
 	
 	<path id="ESP.src">
 		<dirset dir="${basedir}">
+			<include name="src"/>
+		</dirset>
+		
+		<dirset dir="../../ESP/ESP">
 			<include name="src"/>
 		</dirset>
 	</path>
