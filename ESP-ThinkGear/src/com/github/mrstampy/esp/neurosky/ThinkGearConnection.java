@@ -94,4 +94,14 @@ public class ThinkGearConnection extends AbstractRawEspConnection<MultiConnectio
 		return "ESP ThinkGear";
 	}
 
+	@Override
+	public double[][] getCurrentFor(int channelNumber) {
+		return getCurrent();
+	}
+
+	@Override
+	public double[][] getCurrentFor(int numSamples, int channelNumber) {
+		return getCurrent(numSamples);
+	}
+
 }
