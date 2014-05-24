@@ -96,6 +96,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -121,8 +122,9 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import com.github.mrstampy.esp.multiconnectionsocket.AbstractMultiConnectionSocket;
-import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
 import com.github.mrstampy.esp.multiconnectionsocket.ConnectionEvent.State;
+import com.github.mrstampy.esp.multiconnectionsocket.EspChannel;
+import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketException;
 import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 import com.github.mrstampy.esp.neurosky.event.AbstractThinkGearEvent;
 import com.github.mrstampy.esp.neurosky.event.BlinkStrengthThinkGearEvent;
@@ -171,6 +173,8 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 	private SampleBuffer sampleBuffer = new SampleBuffer();
 	private Scheduler scheduler = Schedulers.executor(Executors.newScheduledThreadPool(3));
 	private Subscription subscription;
+
+	private EspChannel thinkGearChannel = new EspChannel(1, "ThinkGear Raw Signal Channel");
 
 	/**
 	 * Connects to the ThinkGear socket on the local host. The system property
@@ -249,7 +253,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 		this.host = host;
 		this.rawData = rawData;
 		this.canSendNeuroskyMessages = canSendNeuroskyMessages;
-		
+
 		addConnectionEventListener(sampleBuffer);
 
 		log.info("MultiConnectonThinkGearSocket is {} events", broadcasting ? "broadcasting" : "not broadcasting");
@@ -313,6 +317,21 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 				sampleBuffer.stopTuning();
 			}
 		}, 10, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public int getNumChannels() {
+		return 1;
+	}
+
+	@Override
+	public List<EspChannel> getChannels() {
+		return Collections.nCopies(1, thinkGearChannel);
+	}
+
+	@Override
+	public EspChannel getChannel(int channelNumber) {
+		return thinkGearChannel;
 	}
 
 	/*
@@ -501,7 +520,7 @@ public class MultiConnectionThinkGearSocket extends AbstractMultiConnectionSocke
 					t1.schedule();
 				} catch (Exception e) {
 					log.error("Unexpected exception", e);
-					if(isConnected()) notifyConnectionEventListeners(State.ERROR_STOPPED);
+					if (isConnected()) notifyConnectionEventListeners(State.ERROR_STOPPED);
 				}
 			}
 		});
