@@ -65,7 +65,7 @@ public class ThinkGearConnection extends AbstractRawEspConnection<MultiConnectio
 	}
 
 	@Override
-	protected MultiConnectionThinkGearSocket getSocket() {
+	public MultiConnectionThinkGearSocket getSocket() {
 		return thinkgear;
 	}
 
