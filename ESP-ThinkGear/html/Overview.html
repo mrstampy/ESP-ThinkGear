@@ -3,6 +3,12 @@
 
 <body>
 	<h1>ESP-ThinkGear - EEG Signal Processing for NeuroSky ThinkGear Devices</h1>
+			
+	<h2>Release 2.1, 25-05-14</h2>
+	<ul>
+		<li>Added Lab and Connection abstractions (explained below)</li>
+		<li>Implemented multi channel support</li>
+	</ul>
 	
 	<h2>Release 2.0, 29-04-14</h2>
 	<ul>
@@ -26,12 +32,213 @@
 		<li><a href="http://mina.apache.org/">Apache MINA</a></li>
 		<li><a href="https://github.com/Netflix/RxJava/">RxJava</a></li>
 	</ul>
+			
+	<h2>Design Goals</h2>
+	
+	<p>
+		<a href="http://mrstampy.github.io/ESP/">ESP</a> is designed to provide Java programs access to EEG device signals
+		and provide the ability to process the signals for the purposes of the program.
+		The ESP library itself is not an implementation, however there are several implementations
+		for specific EEG devices:
+		
+		<ul>
+			<li><a href="http://mrstampy.github.io/ESP-Nia/">ESP-Nia</a></li>
+			<li><a href="http://mrstampy.github.io/ESP-ThinkGear/">ESP-ThinkGear</a></li>
+			<li><a href="http://mrstampy.github.io/ESP-OpenBCI/">ESP-OpenBCI (experimental)</a></li>
+			<li><a href="http://mrstampy.github.io/ESPLab/">ESPLab (JavaFX 8.0 GUI for the ESP Lab interface)</a></li>
+		</ul>
+		
+		ESP provides a common structure for device specific implementations.  This allows programs
+		using the ESP libraries to cater for multiple devices from a single codebase.
+	</p>
+	
+	<p>
+		The core classes have been designed with speed and concurrency in mind using high performance Java libraries:
+		<ul>
+			<li><a href="https://github.com/LMAX-Exchange/disruptor">Disruptor</a></li>
+			<li><a href="http://javolution.org/">Javolution</a></li>
+			<li><a href="http://mina.apache.org/">Apache MINA</a></li>
+			<li><a href="https://github.com/Netflix/RxJava/">RxJava</a></li>
+		</ul>
+	</p>
+	
+	<h2>Primary Design Specifics</h2>
+	
+	<h3><a href="com/github/mrstampy/esp/neurosky/MultiConnectionThinkGearSocket.html">The MultiConnectSocket Interface</a></h3>
+	
+	<p>
+		This interface defines the methods that must be implemented for a class
+		which provides access to EEG hardware.  
+		An <a href="com/github/mrstampy/esp/multiconnectionsocket/AbstractMultiConnectionSocket.html">abstract superclass</a>
+		exists for ease of implementation.
+	</p>
+	
+	<h3><a href="com/github/mrstampy/esp/neurosky/ThinkGearConnection.html">The RawEspConnection Interface</a></h3>
+	
+	<p>
+		RawEspConnection extends the MultiConnectSocket interface.
+		Implementations are intended to encapsulate and control a MultiConnectSocket instance through the implementation
+		of the common methods, as well as provide the current seconds' worth of samples on demand for direct use or further
+		processing.  Signal processing methods exist to provide ease of processing the signal.  
+		An <a href="com/github/mrstampy/esp/dsp/lab/AbstractRawEspConnection.html">abstract superclass</a>
+		exists for ease of implementation.
+	</p>
+	
+	<h3><a href="com/github/mrstampy/esp/dsp/lab/Lab.html">The Lab Interface</a></h3>
+	
+	<p>
+		While the ESP library provides DSP processing classes, how the signal is processed is left to 
+		programs using the library.  Lab implementations provide the ability to obtain the current seconds' worth of samples
+		from the encapsulated RawEspConnection, process the signal and notify the program when a sample is ready for use.
+		
+		A <a href="com/github/mrstampy/esp/dsp/lab/DefaultLab.html">default implementation</a>
+		exists and an <a href="com/github/mrstampy/esp/dsp/lab/AbstractLab.html">abstract superclass</a> provides ease
+		of custom lab implementation. 
+	</p>
+	
+	<h2>Usage</h2>
+	
+	<h3>Direct MultiConnectSocket Usage</h3>
+	
+	<p>
+		This is the lowest level use case.  Programs using ESP library implementations in this manner
+		will receive device-specific signals as they occur.  Each implementation of the ESP library's MultiConnectSocket
+		has a device-specific listener mechanism to obtain the signal.  Pseudo code for usage appears as so:
+		
+		<code>
+			<pre>
+			MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket();
+			
+			// optional, common to all MultiConnectSocket implementations:
+			// add a listener to receive connect/disconnect events
+			socket.addConnectionEventListener(new <a href="com/github/mrstampy/esp/multiconnectionsocket/ConnectionEventListener.html">ConnectionEventListener()</a> {
+				public void connectionEventPerformed(ConnectionEvent e) {
+					doSomethingWith(e);
+				}
+			});
+			
+			socket.addListener(new <a href="com/github/mrstampy/esp/neurosky/subscription/ThinkGearEventListener.html">ThinkGearEventListener()</a> {
+				public void niaEventPerformed(ThinkGearEvent event) {
+					doSomethingWith(e);
+				}
+			});
+			
+			socket.start();
+			</pre>
+		</code>
+	</p>
+	
+	<h3>Direct MultiConnectSocket Usage - Remote Connection</h3>
+	
+	<p>
+		This functionality is from where the MultiConnectSocket derives its name.  Device specific
+		implementations provide the ability to open a socket on a configurable port.  Such sockets
+		facilitate a subscribe and publish of device signals. This allows separate processes and machines
+		to <a href="com/github/mrstampy/esp/neurosky/subscription/ThinkGearSocketConnector.html">receive the device signals</a> 
+		for their own purposes - signal recording, secondary processing, display etc.
+				
+		<code>
+			<pre>
+			// on the host machine or process:
+			// port is set via the system property 'socket.broadcaster.port', default '12345'
+ 			MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket(true);
+			
+			// on the remote process/machine:
+			// port is set via the system property 'socket.broadcaster.port', default '12345'
+			ThinkGearSocketConnector connector = new ThinkGearSocketConnector("host machine name or IP address");
+			
+			connector.addListener(new <a href="com/github/mrstampy/esp/neurosky/subscription/ThinkGearEventListener.html">ThinkGearEventListener()</a> {
+				public void niaEventPerformed(ThinkGearEvent event) {
+					doSomethingWith(e);
+				}
+			});
+			
+			connector.connect();
+			connector.subscribe(....);
+			
+			// and back on the host machine or process:
+			socket.start();
+			</pre>
+		</code>
+	</p>
+	
+	<h3>RawEspConnection Usage</h3>
+	
+	<p>
+		RawEspConnection implementations aggregate the current second's worth of data, insulating the
+		program from device specific listeners.  The samples are intended to be queried periodically
+		in a separate scheduled task or thread.  The period of querying is left to the program and is independent
+		of sample rate.
+		
+		<code>
+			<pre>
+			ThinkGearConnection connection = new ThinkGearConnection();
+			
+			// optional, common to all RawEspConnection implementations:
+			// add a listener to receive connect/disconnect events
+			connection.addConnectionEventListener(new <a href="com/github/mrstampy/esp/multiconnectionsocket/ConnectionEventListener.html">ConnectionEventListener()</a> {
+				public void connectionEventPerformed(ConnectionEvent e) {
+					doSomethingWith(e);
+				}
+			});
+			
+			connection.start();
+			
+			// in a separate scheduled periodic task..
+			int channel = 1; // channel of interest 
+			dealWithCurrentSecondOfSamples(connection.getCurrentFor(channel));
+			</pre>
+		</code>
+	</p>
+	
+	<h3>Lab Usage</h3>
+	
+	<p>
+		Lab implementations provide the ability to process the current seconds' worth of
+		data from the RawEspConnection and notify any interested parties of its completion.
+		Triggering of signal processing is intended to be executed periodically
+		in a separate scheduled task or thread.  The period of triggering is left to the program and is independent
+		of sample rate.
+		<code>
+			<pre>
+			ThinkGearConnection connection = new ThinkGearConnection();
+			
+			// optional, common to all RawEspConnection implementations:
+			// add a listener to receive connect/disconnect events
+			connection.addConnectionEventListener(new <a href="com/github/mrstampy/esp/multiconnectionsocket/ConnectionEventListener.html">ConnectionEventListener()</a> {
+				public void connectionEventPerformed(ConnectionEvent e) {
+					doSomethingWith(e);
+				}
+			});
+			
+			Lab lab = connection.getDefaultLab();
+			
+			int numBands = 40; // first 40 bands
+			lab.setNumBands(numBands); // must be set
+			
+			int channel = 1; // channel of interest for multichannels
+			lab.setChannel(channel); // required if > 1 channel
+			
+			lab.addSignalProcessedListener(new SignalProcessedListener() {
+				public void signalProcessed(double[] processed) {
+					doSomethingWith(processed);
+				}
+			});
+			
+			// other lab values set as appropriate for processing the signal
+			
+			connection.start();
+			
+			// in a separate scheduled periodic task..
+			lab.triggerProcessing();
+			</pre>
+		</code>
+	</p>
 	
 	<h2>Example classes</h2>
 	
 	<p>
 		<a href="com/github/mrstampy/esp/neurosky/ThinkGearTester.html">ThinkGearTester</a><br></br>
-		<a href="com/github/mrstampy/esp/neurosky/dsp/ThinkGearDSP.html">ThinkGearDSP</a>
 	</p>
 	
 	<h2>Architecture</h2>
