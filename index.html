@@ -42,6 +42,12 @@
 <li><a href="http://mina.apache.org/">Apache MINA</a></li>
 <li><a href="https://github.com/Netflix/RxJava/">RxJava</a></li>
 </ul><h2>
+<a name="release-21-25-05-14" class="anchor" href="#release-21-25-05-14"><span class="octicon octicon-link"></span></a>Release 2.1, 25-05-14</h2>
+
+<ul>
+<li>Added Lab and Connection abstractions (explained below)</li>
+<li>Implemented multi channel support</li>
+</ul><h2>
 <a name="release-20-29-04-14" class="anchor" href="#release-20-29-04-14"><span class="octicon octicon-link"></span></a>Release 2.0, 29-04-14</h2>
 
 <ul>
@@ -52,12 +58,161 @@
 <li>Sample rates above 1kHz allowed</li>
 <li>Reasonable results sampling into the 50kHz range</li>
 </ul><h2>
+<a name="design-goals" class="anchor" href="#design-goals"><span class="octicon octicon-link"></span></a>Design Goals</h2>
+
+<p>ESP is designed to provide Java programs access to EEG device signals and provide the ability to process the signals for the purposes of the program. The ESP library itself is not an implementation, however there are several implementations for specific EEG devices:</p>
+
+<ul>
+<li><a href="http://mrstampy.github.io/ESP-Nia/">ESP-Nia</a></li>
+<li><a href="http://mrstampy.github.io/ESP-ThinkGear/">ESP-ThinkGear</a></li>
+<li><a href="http://mrstampy.github.io/ESP-OpenBCI/">ESP-OpenBCI (experimental)</a></li>
+<li><a href="http://mrstampy.github.io/ESPLab/">ESPLab (JavaFX 8.0 GUI for the ESP Lab interface)</a></li>
+</ul><p>ESP provides a common structure for device specific implementations.  This allows programs using the ESP libraries to cater for multiple devices from a single codebase.</p>
+
+<h2>
+<a name="primary-design-specifics" class="anchor" href="#primary-design-specifics"><span class="octicon octicon-link"></span></a>Primary Design Specifics</h2>
+
+<h3>
+<a name="the-multiconnectsocket-interface" class="anchor" href="#the-multiconnectsocket-interface"><span class="octicon octicon-link"></span></a><a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/multiconnectionsocket/MultiConnectionSocket.java">The MultiConnectSocket Interface</a>
+</h3>
+
+<p>This interface defines the methods that must be implemented for a class which provides access to EEG hardware. An <a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/multiconnectionsocket/AbstractMultiConnectionSocket.java">abstract superclass</a> exists for ease of implementation.</p>
+
+<h3>
+<a name="the-rawespconnection-interface" class="anchor" href="#the-rawespconnection-interface"><span class="octicon octicon-link"></span></a><a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/dsp/lab/RawEspConnection.java">The RawEspConnection Interface</a>
+</h3>
+
+<p>RawEspConnection extends the MultiConnectSocket interface. Implementations are intended to encapsulate and control a MultiConnectSocket instance through the implementation of the common methods, as well as provide the current seconds' worth of samples on demand for direct use or further processing.  Signal processing methods exist to provide ease of processing the signal.  An <a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/dsp/lab/AbstractRawEspConnection.java">abstract superclass</a> exists for ease of implementation.</p>
+
+<h3>
+<a name="the-lab-interface" class="anchor" href="#the-lab-interface"><span class="octicon octicon-link"></span></a><a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/dsp/lab/Lab.java">The Lab Interface</a>
+</h3>
+
+<p>While the ESP library provides DSP processing classes, how the signal is processed is left to programs using the library.  Lab implementations provide the ability to obtain the current seconds' worth of samples from the encapsulated RawEspConnection, process the signal and notify the program when a sample is ready for use.</p>
+
+<p>A <a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/dsp/lab/DefaultLab.java">default implementation</a>
+exists and an <a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/dsp/lab/AbstractLab.java">abstract superclass</a> provides ease
+of custom lab implementation. </p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="direct-multiconnectsocket-usage" class="anchor" href="#direct-multiconnectsocket-usage"><span class="octicon octicon-link"></span></a>Direct MultiConnectSocket Usage</h3>
+
+<p>This is the lowest level use case.  Programs using ESP library implementations in this manner will receive device-specific signals as they occur.  Each implementation of the ESP library's MultiConnectSocket has a device-specific listener mechanism to obtain the signal.  Pseudo code for usage appears as so:</p>
+
+<pre><code>    MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket();
+
+    // optional, common to all MultiConnectSocket implementations:
+    // add a listener to receive connect/disconnect events
+    socket.addConnectionEventListener(new ConnectionEventListener() {
+        public void connectionEventPerformed(ConnectionEvent e) {
+            doSomethingWith(e);
+        }
+    });
+
+    socket.addListener(new ThinkGearEventListener() {
+        public void thinkGearEventPerformed(AbstractMultiConnectionEvent&lt;EventType&gt; e) {
+            doSomethingWith(e);
+        }
+    });
+
+    socket.start();
+</code></pre>
+
+<h3>
+<a name="direct-multiconnectsocket-usage---remote-connection" class="anchor" href="#direct-multiconnectsocket-usage---remote-connection"><span class="octicon octicon-link"></span></a>Direct MultiConnectSocket Usage - Remote Connection</h3>
+
+<p>This functionality is from where the MultiConnectSocket derives its name.  Device specific implementations provide the ability to open a socket on a configurable port.  Such sockets facilitate a subscribe and publish of device signals. This allows separate processes and machines to <a href="https://github.com/mrstampy/ESP/blob/master/ESP/src/com/github/mrstampy/esp/multiconnectionsocket/AbstractSocketConnector.java">receive the device signals</a> for their own purposes - signal recording, secondary processing, display etc.</p>
+
+<pre><code>    // on the host machine or process:
+    // port is set via the system property 'socket.broadcaster.port', default '12345'
+    MultiConnectionThinkGearSocket socket = new MultiConnectionThinkGearSocket(true);
+
+    // on the remote process/machine:
+    // port is set via the system property 'socket.broadcaster.port', default '12345'
+    ThinkGearSocketConnector connector = new ThinkGearSocketConnector("host machine name or IP address");
+
+    connector.addListener(new ThinkGearEventListener() {
+        public void thinkGearEventPerformed(AbstractMultiConnectionEvent&lt;EventType&gt; e) {
+            doSomethingWith(e);
+        }
+    });
+
+    connector.connect();
+    connector.subscribe(....);
+
+    // and back on the host machine or process:
+    socket.start();
+</code></pre>
+
+<h3>
+<a name="rawespconnection-usage" class="anchor" href="#rawespconnection-usage"><span class="octicon octicon-link"></span></a>RawEspConnection Usage</h3>
+
+<p>RawEspConnection implementations aggregate the current second's worth of data, insulating the program from device specific listeners.  The samples are intended to be queried periodically in a separate scheduled task or thread.  The period of querying is left to the program and is independent of sample rate.</p>
+
+<pre><code>    ThinkGearConnection connection = new ThinkGearConnection();
+
+    // optional, common to all RawEspConnection implementations:
+    // add a listener to receive connect/disconnect events
+    connection.addConnectionEventListener(new ConnectionEventListener() {
+        public void connectionEventPerformed(ConnectionEvent e) {
+            doSomethingWith(e);
+        }
+    });
+
+    connection.start();
+
+    // in a separate scheduled periodic task..
+    int channel = 1; // channel of interest 
+    dealWithCurrentSecondOfSamples(connection.getCurrentFor(channel));
+</code></pre>
+
+<h3>
+<a name="lab-usage" class="anchor" href="#lab-usage"><span class="octicon octicon-link"></span></a>Lab Usage</h3>
+
+<p>Lab implementations provide the ability to process the current seconds' worth of data from the RawEspConnection and notify any interested parties of its completion. Triggering of signal processing is intended to be executed periodically in a separate scheduled task or thread.  The period of triggering is left to the program and is independent of sample rate.</p>
+
+<pre><code>    ThinkGearConnection connection = new ThinkGearConnection();
+
+    // optional, common to all RawEspConnection implementations:
+    // add a listener to receive connect/disconnect events
+    connection.addConnectionEventListener(new ConnectionEventListener() {
+        public void connectionEventPerformed(ConnectionEvent e) {
+            doSomethingWith(e);
+        }
+    });
+
+    Lab lab = connection.getDefaultLab();
+
+    int numBands = 40; // first 40 bands
+    lab.setNumBands(numBands); // must be set
+
+    int channel = 1; // channel of interest for multichannels
+    lab.setChannel(channel); // required if &gt; 1 channel
+
+    lab.addSignalProcessedListener(new SignalProcessedListener() {
+        public void signalProcessed(double[] processed) {
+            doSomethingWith(processed);
+        }
+    });
+
+    // other lab values set as appropriate for processing the signal
+
+    connection.start();
+
+    // in a separate scheduled periodic task..
+    lab.triggerProcessing();
+</code></pre>
+
+<h2>
 <a name="maven-dependency" class="anchor" href="#maven-dependency"><span class="octicon octicon-link"></span></a>Maven Dependency</h2>
 
 <pre><code>   &lt;dependency&gt;
        &lt;groupId&gt;com.github.mrstampy&lt;/groupId&gt;
        &lt;artifactId&gt;esp-thinkgear&lt;/artifactId&gt;
-       &lt;version&gt;2.0&lt;/version&gt;
+       &lt;version&gt;2.1&lt;/version&gt;
    &lt;/dependency&gt;
 </code></pre>
 
