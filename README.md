@@ -20,7 +20,7 @@ This library provides the [NeuroSky](http://www.neurosky.com) MindWave ThinkGear
 * Sample rate and sample size now mutable
 * Sample rates above 1kHz allowed
 * Reasonable results sampling into the 50kHz range
-* 
+
 ## Design Goals
 
 ESP is designed to provide Java programs access to EEG device signals and provide the ability to process the signals for the purposes of the program. The ESP library itself is not an implementation, however there are several implementations for specific EEG devices:
