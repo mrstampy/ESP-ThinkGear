@@ -86,7 +86,7 @@ This functionality is from where the MultiConnectSocket derives its name.  Devic
 		// port is set via the system property 'socket.broadcaster.port', default '12345'
 		ThinkGearSocketConnector connector = new ThinkGearSocketConnector("host machine name or IP address");
 		
-		connector..addListener(new ThinkGearEventListener() {
+		connector.addListener(new ThinkGearEventListener() {
 			public void thinkGearEventPerformed(AbstractMultiConnectionEvent<EventType> e) {
 				doSomethingWith(e);
 			}
